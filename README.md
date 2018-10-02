@@ -4,7 +4,8 @@ Login that will allow the admin to add money from a user's account. Also allows 
 Purchase Program:
 A program that will allow a user to login, and then purchase something. The cost will be one dollar.
 Requird Modules:
-passlib
-pip
-gspread
-ouath2client
+passlib,
+pip,
+gspread,
+and,
+ouath2client.
