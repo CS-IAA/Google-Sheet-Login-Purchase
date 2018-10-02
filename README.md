@@ -7,5 +7,5 @@ Requird Modules:
 passlib,
 pip,
 gspread,
-and,
+and
 ouath2client.
