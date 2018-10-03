@@ -37,11 +37,6 @@ lsttest2 = []
 global userlist2
 userlist2 = []
 
-global lsttest3
-lsttest3 = []
-global userlist3
-userlist3 = []
-
 def next_available_row(worksheet): #next avilable row
     str_list = list(filter(None, worksheet.col_values(1)))  # fastest
     return str(len(str_list)+1)
@@ -92,24 +87,9 @@ def second():
             else:  # look at foor loop that deosnt have the list(for x in z). this is what happens if the "x" is not the one
                 xx = (x[0] + ' '+ x[1]) #restores the other username/passwords back to their original state before .split(' ')
                 lsttest2.append(xx) #check comments in rd() function to see how this is useful
-                userlist3.append(x[0])
-    def goodhash3():
-        global lst2
-        for x in lst2: #goes through a encrypted list that contains username/password
-            x = x.split(' ') #splits up the username/password into their own list and puts username as x[0] and pass as x[1]
-            test1 = pbkdf2_sha256.verify(usern2.get(), x[0]) #checks to see if the username client entered matches encrypted version at x[0]
-            if test1 == True: #if both match, this means that the user exists, so do the following
-                userlist3.append(usern2.get())
-            else:  # look at foor loop that deosnt have the list(for x in z). this is what happens if the "x" is not the one
-                userlist3.append(x[0])
-
 
     def money_add():
         try:
-            global usern2
-            global pasw2
-            global money2
-
             goodhash2()
             if len(userlist2) != 0:  # checks to see if sheets has users
                 for i in userlist2:
@@ -121,40 +101,66 @@ def second():
                     if len(betatest) != 0:  # checks to see if sheets has users
                         for x in betatest:
                             if x == True: #if the user matches
+                                print(usercount)
                                 if int(money2.get()) >= 0: #to make sure that they don't dont a negative number
                                     userbalance = sheet2.cell(usercount, 3).value  # row,column
                                     userbalance = int(userbalance)
                                     userbalance += int(money2.get())
                                     sheet2.update_cell(usercount, 3, userbalance)  # row,column
                                     showinfo("Success", "You successfully added $"+money2.get()+".00!")
-                                    window.destroy()
+                                    usern2.set('')
+                                    pasw2.set('')
+                                    money2.set('')
+                                    del lsttest2[:]
+                                    del userlist2[:]
+                                    del betatest[:]
+
                                 else:
                                     showinfo("Error", "No negative money allowed!")  # popup
-                                    window.destroy()
+                                    del lsttest2[:]
+                                    del userlist2[:]
+                                    del betatest[:]
+
                             usercount += 1
                 else:
                     showinfo("Error", "User does not exist!")
-                    window.destroy()  # ends the tkinter
+                    usern2.set('')
+                    pasw2.set('')
+                    money2.set('')
+                    del lsttest2[:]
+                    del userlist2[:]
+                    del betatest[:]
+
             else:
                 showinfo("Error", "Please enter both the username and money!")  # popup
-                window.destroy()
-        except: #if they leave the money field blank, leters in money field
-            showinfo("Error", "Please enter both the username and money. Make sure the money is in numerical form.")  # popup
-            window.destroy()
+                del lsttest2[:]
+                del userlist2[:]
+                del betatest[:]
 
-    global betatest
+        except ValueError: #if they leave the money field blank, leters in money field
+            showinfo("Error", "Please make sure to enter the money and that it is in an integer in numerical form.")  # popup
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+        except TclError: #if they leave the money field blank, leters in money field
+            showinfo("Error", "Please enter both the username and money. Make sure the money is in numerical form.")  # popup
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+
+
+
     betatest = []
 
     def createup():
         try:
-            global usern2
-            global pasw2
-            global money2
-
             if (usern2.get() == '' or pasw2.get() == ''):
                 # makes sure there is entry in both username/password/money
                 showinfo("Error", "Please enter the username, password and money!")  # popup
-                window.destroy()
+                del lsttest2[:]
+                del userlist2[:]
+                del betatest[:]
+
             else:
                 if int(money2.get()) >= 0: #to make sure that they don't dont a negative number
                     goodhash2()
@@ -167,18 +173,33 @@ def second():
                         letup()
                 else:
                     showinfo("Error", "No negative money allowed!")  # popup
-                    window.destroy()
+                    del lsttest2[:]
+                    del userlist2[:]
+                    del betatest[:]
+
         except ValueError:
             showinfo("Error", "Please make sure to enter the money and that it is in an integer in numerical form!")  # popup
-            window.destroy()
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+
         except TclError: #if they leave the money field blank
             showinfo("Error", "Please enter the username, password and money. Make sure the money is in numerical form.")  # popup
-            window.destroy()
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+
 
     def letup():
         if True in betatest:
             showinfo("Error", "Sorry, but that user already exists. Please try again!")
-            window.destroy()  # ends the tkinter
+            usern2.set('')
+            pasw2.set('')
+            money2.set('')
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+
         else:
             hashusr = pbkdf2_sha256.hash(usern2.get())  # encrypts what the user inputs
             hashpsw = pbkdf2_sha256.hash(pasw2.get())  # encrypts what the user inputs
@@ -187,7 +208,16 @@ def second():
             sheet2.update_acell("C{}".format(next_row2), money2.get())
 
             showinfo("Success","New user created!")  # tells user how the code successfully managed to encrypt the username/password like it was supposed to
-            window.destroy()  # ends the tkinter
+            usern2.set('')
+            pasw2.set('')
+            money2.set('')
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
+            del lst2[:] #does this otherwise it would look at the original list of users when the program ran, which would not included removed/added users
+            list_of_hashes2 = sheet2.get_all_records()
+            for x in list_of_hashes2:
+                lst2.append(x['Username'] + ' ' + str(x['Password']))
 
     def getout(): #removing the user
         goodhash2()
@@ -197,7 +227,9 @@ def second():
                 betatest.append(test1)
         if usern2.get() == '':
             showinfo("Error", "Please enter the username!")  # popup
-            window.destroy()
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
         elif True in betatest:
             usercount=2
             if len(betatest) != 0:  # checks to see if sheets has users
@@ -205,17 +237,29 @@ def second():
                     if x==True:
                         sheet2.delete_row(usercount)
                         showinfo("Success", "User removed!")
-                        window.destroy()
+                        usern2.set('')
+                        pasw2.set('')
+                        money2.set('')
+                        del lsttest2[:]
+                        del userlist2[:]
+                        del betatest[:]
+                        del lst2[:] #does this otherwise it would look at the original list of users when the program ran, which would not included removed/added users
+                        list_of_hashes2 = sheet2.get_all_records()
+                        for x in list_of_hashes2:
+                            lst2.append(x['Username'] + ' ' + str(x['Password']))
+
                     usercount+=1
         else:
             showinfo("Error", "User does not exist!")
-            window.destroy()  # ends the tkinter
+            usern2.set('')
+            pasw2.set('')
+            money2.set('')
+            del lsttest2[:]
+            del userlist2[:]
+            del betatest[:]
 
-    global usern2
     usern2 = StringVar()
-    global pasw2
     pasw2 = StringVar()
-    global money2
     money2 = StringVar()
 
     mainframe2 = ttk.Frame(window, padding="5 10")
@@ -279,7 +323,6 @@ def begin():
 
             else:  # look at foor loop that deosnt have the list(for x in z). this is what happens if the "x" is not the one
                 showinfo("Error", "Incorrect username or password!")
-                root.destroy()  # ends the tkinter
 
     mainframe = ttk.Frame(root, padding="5 10")
     mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
