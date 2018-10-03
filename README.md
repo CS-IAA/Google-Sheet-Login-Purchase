@@ -5,7 +5,6 @@ Purchase Program:
 A program that will allow a user to login, and then purchase something. The cost will be one dollar.
 Requird Modules:
 passlib,
-pip,
 gspread,
 and
 ouath2client.

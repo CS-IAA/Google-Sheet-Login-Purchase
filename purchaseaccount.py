@@ -12,9 +12,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 #####
-Ismail A Ahmed/Hanzala N Siddiqui
-purchaseaccount.py
-Version 4.0
+Ismail A Ahmed
+loginGUI.py
+Version 3.0
 '''
 
 from tkinter import *
@@ -87,6 +87,20 @@ def goodhash():
 
 def rd():
     #this placed here so time checked everytime user clicked 'check' box, else user could start the program, let run for more than 10 minuutes, and still be allowed to search
+    s = socket.socket()  # Create a socket object
+    port = 12345  # Reserve a port for your service.
+    host = '172.17.2.87'  # Get local machine name
+    s.connect((host, port))
+    file0 = s.recv(1024) #receives what server sent
+    s.close  # Close the socket when done
+    file0 = str(file0) #server time
+    myfile = time.ctime(time.time())  # my time
+    file0 = file0.strip('b').strip("'")  # gets rid of the trash
+    min1 = file0[14:16] #server minute
+    min2 = myfile[14:16] #client minute
+
+    if int(min1) + 10 >= int(min2) and int(min1) - 10 <= int(min2): #has to be within 10 minutes of server time
+        if int(min2) + 10 >= int(min1) and int(min2) - 10 <= int(min1): #has to be within 10 minutes of server time
             if (usern.get() == '' or pasw.get() == ''): # makes sure there is entry in both username/password
                 showinfo("Error", "Please enter both the username and password!")  #popup
             else:
@@ -95,35 +109,41 @@ def rd():
                 file = (usern.get() + ' ' + pasw.get()) #gets the username and password client entered and adds space in between like in lsttest list
                 if file not in lsttest:
                     showinfo("Error", "Incorrect username or password!")
+                    usern.set('')
+                    pasw.set('')
 
-                    root.destroy()  # ends the tkinter
                 else:
                     for x in lsttest:  #checks to see if what the client entered is in lsttest list
 
                         if x==file:
                             #print(count)
-                            userbalance=sheet.cell(count, 3).value#row,column
+                            showinfo("Success", "Logged in!")
+                            file = ('Username:'+ usern.get() + ' ' + 'Time:' + file0 + '\n')
+                            userbalance=sheet.cell(count, 3).value
                             #print(type(userbalance))
                             userbalance=int(userbalance)
                             userbalance-=1
-
-                            if userbalance>=0: #to make sure they cant have a negative balance
-                                sheet.update_cell(count, 3, userbalance)#row,column
+                            #row,column
+                            if userbalance>0:
+                                sheet.update_cell(count, 3, userbalance)
                                 showinfo("Purchase Succsessful", "Your Balance is $"+str(userbalance)+".00!")
-                                root.destroy() #ends the tkinter
-
                             else:
                                 showinfo("Purchase Failed", "Insufficient Credit!")
+                            usern.set('')
+                            pasw.set('')
 
-                                root.destroy() #ends the tkinter
-                        else:  # look at foor loop that deosnt have the list(for x in z). this is what happens if the "x" is not the one
-                            pass
-                            #usern.set('')  # makes username empty
-                            #pasw.set('')  # makes password empty
-                            #root.destroy() #ends the tkinter
-                            # break
+
                         count+=1
 
+        else:
+            showinfo("Error", "Please update your time!") #client/server NOT  within 10 minutes of client/server time
+            usern.set('')  # makes username empty
+            pasw.set('')  # makes password empty
+
+    else:
+        showinfo("Error", "Please update your time!") #client/server NOT  within 10 minutes of client/server time
+        usern.set('')  # makes username empty
+        pasw.set('')  # makes password empty
 root = Tk()
 root.title("Purchase")
 
